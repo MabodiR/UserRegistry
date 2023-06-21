@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
+use App\Listing;
 use App\User;
 
 class UserListing extends Controller
@@ -14,7 +15,7 @@ class UserListing extends Controller
      */
     public function index()
     {
-        $users = User::all();
+        $users = Listing::orderBy('created_at', 'desc')->get();
         return view('user-listings.index', compact('users'));
     }
 
@@ -26,8 +27,37 @@ class UserListing extends Controller
      */
     public function show($id)
     {
-        $user = User::findOrFail($id);
-        return view('user-listings.show', compact('user'));
+        $user = Listing::findOrFail($id);
+
+        return view('user-listings.show')->with('user', $user);
+    }
+
+    /**
+     * Store a newly created user in storage.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\Response
+     */
+    public function store(Request $request)
+    {
+        $request->validate([
+            'name' => 'required',
+            'surname' => 'required',
+            'email' => 'required|email|unique:users',
+            'position' => 'required',
+        ], [
+            'position.required' => 'Please enter your current position.',
+        ]);
+    
+        $user = new Listing;
+        $user->name = $request->input('name');
+        $user->surname = $request->input('surname');
+        $user->email = $request->input('email');
+        $user->position = $request->input('position');
+        $user->save();
+
+        return redirect()->back();
+
     }
 
     /**
@@ -39,14 +69,14 @@ class UserListing extends Controller
      */
     public function update(Request $request, $id)
     {
-        $user = User::findOrFail($id);
+        $user = Listing::findOrFail($id);
         $user->name = $request->input('name');
         $user->surname = $request->input('surname');
         $user->email = $request->input('email');
         $user->position = $request->input('position');
         $user->save();
-
-        return redirect()->route('user-listings.show', $user->id)->with('success', 'User updated successfully');
+    
+        return redirect()->route('user-listings.show', ['id' => $user->id])->with('success', 'User updated successfully');
     }
 
     /**
@@ -57,9 +87,13 @@ class UserListing extends Controller
      */
     public function destroy($id)
     {
-        $user = User::findOrFail($id);
+        $user = Listing::findOrFail($id);
         $user->delete();
-
-        return redirect()->route('user-listings.index')->with('success', 'User deleted successfully');
+    
+        // Return a JSON response indicating success
+        return response()->json([
+            'success' => true,
+            'message' => 'User deleted successfully'
+        ]);
     }
 }
