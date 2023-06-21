@@ -162,9 +162,9 @@
 $(document).ready(function() {
 
     // Show the modal when the "Add New User" button is clicked
-    $('#addUserModalBtn').click(function() {
-        $('#addUserModal').modal('show');
-    });
+        $('#addUserModalBtn').click(function() {
+            $('#addUserModal').modal('show');
+        });
 
       // Show the modal when the "Add New User" button is clicked
       $('#addUserModalBtn').click(function () {
@@ -247,27 +247,32 @@ $(document).ready(function() {
 
       });
 
+});
 
 
-    //delete user section
+$(document).ready(function() {
+
+    // Delete user section
     var userIdToDelete;
     var clickedIcon;
 
     $('.delete-user').on('click', function() {
         userIdToDelete = $(this).data('user-id');
-        $('#deleteLoadingButton').removeClass('d-none');
+    
         clickedIcon = $(this); // Store the reference to $(this)
+        $('#confirmDeleteModal').modal('show'); // Show the delete confirmation modal
     });
 
     $('#confirmDeleteBtn').on('click', function() {
-        $('#confirmDeleteModal').modal('show'); //show modal
-        setTimeout(function() {
+       
+        $('#deleteLoadingButton').removeClass('d-none');
+        // Delay in milliseconds (2 seconds in this case)
+      setTimeout(function () {
 
-        $('#confirmDeleteModal').modal('hide'); //hide loading button
-
+        $('#confirmDeleteModal').modal('hide'); // Hide the confirmation modal
         $.ajax({
             url: '/user-listings/destroy/' + userIdToDelete,
-            type: 'POST',
+            type: 'DELETE',
             data: {
                 _token: $('meta[name="csrf-token"]').attr('content')
             },
@@ -281,11 +286,11 @@ $(document).ready(function() {
                 console.error(error);
             }
         });
-    }, 3000); // Delay in milliseconds (3 seconds in this case)
-
+      }, 2000);
     });
 
 
 });
+
 </script>
 </html>
