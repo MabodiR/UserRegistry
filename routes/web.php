@@ -11,6 +11,9 @@
 |
 */
 
-Route::get('/', function () {
-    return view('welcome');
-});
+//user listing index
+Route::get('/', 'UserListing@index')->name('user-listings');
+
+Route::get('/user-listings', 'UserListing@index')->name('user-listings'); //user listing
+Route::post('/user-listings/store', 'UserListing@store')->name('user-store');  //create user
+Route::post('/user-listings/destroy/{id}', 'UserListing@destroy')->name('user-destroy'); //delete user
